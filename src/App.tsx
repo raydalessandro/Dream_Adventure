@@ -1,14 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StoryNode } from './components/StoryNode';
 import { PathTracker } from './components/PathTracker';
 import { StatsPanel } from './components/StatsPanel';
 import { CrystalCollection } from './components/CrystalCollection';
 import { AudioPlayer } from './components/AudioPlayer';
+import { TestRunner } from './components/TestRunner';
 import { useGameState } from './hooks/useGameState';
 import { endings, determineEnding } from './data/endings';
 import './styles/global.css';
 
 function App() {
+  const [showTests, setShowTests] = useState(false);
+  
   const {
     gameState,
     getCurrentNode,
@@ -18,6 +21,39 @@ function App() {
     loadSavedGame,
     startNewGame
   } = useGameState();
+
+  // Check for ?test query param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('test') === 'true') {
+      setShowTests(true);
+    }
+  }, []);
+
+  // Test mode
+  if (showTests) {
+    return (
+      <div className="app-container">
+        <div className="main-content">
+          <TestRunner />
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <button 
+              className="choice-button"
+              onClick={() => {
+                window.location.href = window.location.origin;
+              }}
+              style={{ display: 'inline-flex' }}
+            >
+              <div className="choice-emoji">🎮</div>
+              <div className="choice-content">
+                <div className="choice-text">Torna al Gioco</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const currentNode = getCurrentNode();
   const currentEnding = currentNode?.isEnding 

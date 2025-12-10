@@ -51,7 +51,13 @@ export function useGameState() {
 
   // Get current node
   const getCurrentNode = useCallback(() => {
-    return storyNodes[gameState.currentNode];
+    const node = storyNodes[gameState.currentNode];
+    if (!node) {
+      console.error(`Node not found: ${gameState.currentNode}`);
+      // Fallback to start if node missing
+      return storyNodes['start'];
+    }
+    return node;
   }, [gameState.currentNode]);
 
   // Make a choice and update game state
@@ -82,7 +88,13 @@ export function useGameState() {
         choice.effects(newState);
       }
 
-      // Move to next node
+      // Move to next node (with validation)
+      if (!storyNodes[choice.next]) {
+        console.error(`Invalid next node: ${choice.next}`);
+        // Stay on current node if next is invalid
+        return prevState;
+      }
+      
       newState.currentNode = choice.next;
       
       // Mark node as visited
@@ -92,7 +104,11 @@ export function useGameState() {
       // Execute onEnter effects of new node if it exists
       const nextNode = storyNodes[choice.next];
       if (nextNode?.onEnter) {
-        nextNode.onEnter(newState);
+        try {
+          nextNode.onEnter(newState);
+        } catch (error) {
+          console.error('Error in onEnter effect:', error);
+        }
       }
 
       return newState;

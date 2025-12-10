@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { StoryNode as StoryNodeType, GameState, Choice } from '../types';
 import { ChoiceButton } from './ChoiceButton';
+import { TextToSpeech } from './TextToSpeech';
 
 interface StoryNodeProps {
   node: StoryNodeType;
@@ -30,11 +31,17 @@ export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
 
     const text = node.text;
     let currentIndex = 0;
+    let isCancelled = false;
     
     // Speed: 30ms per carattere (circa 33 caratteri/sec)
     const typingSpeed = 20;
     
     const interval = setInterval(() => {
+      if (isCancelled) {
+        clearInterval(interval);
+        return;
+      }
+      
       if (currentIndex <= text.length) {
         setDisplayedText(text.slice(0, currentIndex));
         currentIndex++;
@@ -45,7 +52,10 @@ export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
       }
     }, typingSpeed);
 
-    return () => clearInterval(interval);
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
   }, [isVisible, node.text]);
 
   // Skip typewriter on click
@@ -111,6 +121,14 @@ export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
         ))}
         {isTyping && <span className="cursor">▋</span>}
       </div>
+
+      {/* Text-to-Speech */}
+      {showChoices && (
+        <TextToSpeech 
+          text={node.text}
+          autoPlay={false}
+        />
+      )}
 
       {/* Typing indicator */}
       {isTyping && (

@@ -5,54 +5,69 @@ interface AudioPlayerProps {
   autoPlay?: boolean;
 }
 
-export function AudioPlayer({ music, autoPlay = true }: AudioPlayerProps) {
+export function AudioPlayer({ music, autoPlay = false }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.3);
+  const [hasError, setHasError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (!music) return;
 
-    // Create or update audio element
+    // Create audio element if doesn't exist
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.loop = true;
       audioRef.current.volume = volume;
+      
+      // Error handling
+      audioRef.current.addEventListener('error', () => {
+        console.warn(`Could not load audio: ${music}`);
+        setHasError(true);
+        setIsPlaying(false);
+      });
     }
 
-    // Change source if different
+    const audio = audioRef.current;
     const newSrc = `/sounds/${music}`;
-    if (audioRef.current.src !== newSrc) {
-      audioRef.current.src = newSrc;
+    
+    // Only change if different source
+    if (audio.src !== window.location.origin + newSrc) {
+      setHasError(false);
+      audio.src = newSrc;
+      audio.load();
       
       if (autoPlay && !isMuted) {
-        audioRef.current.play().catch(() => {
-          // Auto-play blocked by browser, will need user interaction
-          setIsPlaying(false);
-        });
-        setIsPlaying(true);
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch((err) => {
+            console.warn('Auto-play blocked or audio error:', err);
+            setIsPlaying(false);
+          });
       }
     }
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+      if (audio && !audio.paused) {
+        audio.pause();
       }
     };
   }, [music, autoPlay, isMuted, volume]);
 
   const togglePlay = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || hasError) return;
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().catch(() => {
-        console.log('Could not play audio');
-      });
-      setIsPlaying(true);
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => {
+          console.warn('Could not play audio:', err);
+          setIsPlaying(false);
+        });
     }
   };
 
@@ -71,7 +86,8 @@ export function AudioPlayer({ music, autoPlay = true }: AudioPlayerProps) {
     }
   };
 
-  if (!music) return null;
+  // Don't render if no music or error
+  if (!music || hasError) return null;
 
   return (
     <div className="audio-player">
