@@ -61,7 +61,9 @@ Davanti a te appaiono due figure di luce: un bambino coraggioso con gli occhi cu
         stats: { courage: 1, kindness: 1 },
         effects: (state: GameState) => {
           state.character = 'rocco'; // Default ma con bonus bilanciato
-          state.specialItems.push('double_spirit');
+          if (!state.specialItems?.includes('double_spirit')) {
+            state.specialItems.push('double_spirit');
+          }
         }
       }
     ]
@@ -284,8 +286,12 @@ Nocino fruga tra le sue ghiande e tira fuori qualcosa di brillante—il CRISTALL
 "L'avevo trovato stamattina! È tuo. E... posso venire con te? Non voglio stare più solo."`,
     image: 'nocino_saved.jpg',
     onEnter: (state) => {
-      state.crystalsFound.push('verde');
-      state.allies.push('Nocino');
+      if (!state.crystalsFound?.includes('verde')) {
+        state.crystalsFound.push('verde');
+      }
+      if (!state.allies?.includes('Nocino')) {
+        state.allies.push('Nocino');
+      }
     },
     choices: [
       {
@@ -325,7 +331,9 @@ Qualcosa si stringe nel tuo petto. Hai il cristallo—obiettivo raggiunto—ma t
 Il cristallo verde improvvisamente diventa più pesante. E senti una voce sussurrare: "I cristalli dell'armonia risuonano solo con cuori che scelgono l'armonia."`,
     image: 'crystal_cold.jpg',
     onEnter: (state) => {
-      state.crystalsFound.push('verde');
+      if (!state.crystalsFound?.includes('verde')) {
+        state.crystalsFound.push('verde');
+      }
     },
     choices: [
       {
@@ -573,8 +581,10 @@ Nocino ti abbraccia forte. "Vieni con me? Per favore?"
 Il cristallo pulsa caldo nella tua mano. Hai imparato: tornare indietro non è debolezza, è coraggio.`,
     image: 'redemption.jpg',
     onEnter: (state) => {
-      state.allies.push('Nocino');
-      state.secretsUnlocked++;
+      if (!state.allies?.includes('Nocino')) {
+        state.allies.push('Nocino');
+      }
+      state.secretsUnlocked = (state.secretsUnlocked || 0) + 1;
     },
     choices: [
       {
@@ -634,10 +644,16 @@ Il cristallo verde cade dall'albero, direttamente nelle tue mani. Ma non è solo
 "Per entrambi," dice Memorìa. "Per l'amico che salva e per l'amico che viene salvato."`,
     image: 'memoria_happy.jpg',
     onEnter: (state) => {
-      state.crystalsFound.push('verde');
-      state.allies.push('Memoria');
-      state.specialItems.push('double_green_crystal');
-      state.secretsUnlocked++;
+      if (!state.crystalsFound?.includes('verde')) {
+        state.crystalsFound.push('verde');
+      }
+      if (!state.allies?.includes('Memoria')) {
+        state.allies.push('Memoria');
+      }
+      if (!state.specialItems?.includes('double_green_crystal')) {
+        state.specialItems.push('double_green_crystal');
+      }
+      state.secretsUnlocked = (state.secretsUnlocked || 0) + 1;
     },
     choices: [
       {
@@ -670,10 +686,16 @@ L'Albero del Tempo improvvisamente fiorisce con mille fiori blu. Un cristallo ve
 "Questo è per te," dice Memorìa, ora sorridente per la prima volta. "La Piuma dei Ricordi Condivisi. Con questa, puoi vedere i momenti più belli vissuti da chiunque incontri. È il mio dono a te, che mi hai insegnato a non essere sola."`,
     image: 'memoria_healed.jpg',
     onEnter: (state) => {
-      state.crystalsFound.push('verde');
-      state.allies.push('Memoria');
-      state.specialItems.push('memory_feather');
-      state.secretsUnlocked += 2;
+      if (!state.crystalsFound?.includes('verde')) {
+        state.crystalsFound.push('verde');
+      }
+      if (!state.allies?.includes('Memoria')) {
+        state.allies.push('Memoria');
+      }
+      if (!state.specialItems?.includes('memory_feather')) {
+        state.specialItems.push('memory_feather');
+      }
+      state.secretsUnlocked = (state.secretsUnlocked || 0) + 2;
     },
     choices: [
       {
@@ -808,7 +830,11 @@ Davanti a te, il sentiero continua verso la cima. Ma c'è anche un sentiero late
         preview: 'Il suo incoraggiamento ti ha aiutato!',
         next: 'to_dragon_peak',
         stats: { courage: 2, kindness: 1 },
-        effects: (state) => { state.allies.push('Pipa'); }
+        effects: (state) => {
+          if (!state.allies?.includes('Pipa')) {
+            state.allies.push('Pipa');
+          }
+        }
       },
       {
         id: 'explore_waterfall',
@@ -883,7 +909,9 @@ L'acqua inizia a brillare. Dal fondo sale qualcosa—il CRISTALLO BLU, avvolto i
 Ma poi aggiunge: "Però c'è qualcun altro nel lago che ha bisogno di aiuto. I pesci luminosi non possono tornare alle acque profonde perché c'è qualcosa che blocca il passaggio. Vuoi aiutarli prima di andare?"`,
     image: 'reflection_wisdom.jpg',
     onEnter: (state) => {
-      state.crystalsFound.push('blu');
+      if (!state.crystalsFound?.includes('blu')) {
+        state.crystalsFound.push('blu');
+      }
     },
     choices: [
       {
@@ -977,6 +1005,352 @@ La roccia è enorme. Troppo pesante per te. Ma poi noti qualcosa—è appoggiata
         resonance: 'curiosity'
       }
     ]
+  },
+
+  // ============================================
+  // NODI PLACEHOLDER - Work in Progress
+  // ============================================
+
+  coming_soon: {
+    id: 'coming_soon',
+    title: '✨ In Arrivo...',
+    text: `Hai esplorato tutto il contenuto disponibile in questa versione!
+
+🚧 **Questa parte della storia è ancora in sviluppo.**
+
+La tua avventura nel Regno dei Sogni continuerà presto con nuovi capitoli, cristalli da trovare e misteri da svelare.
+
+Grazie per aver giocato! 🌟`,
+    image: 'start_clearing.jpg',
+    choices: [
+      {
+        id: 'restart_game',
+        text: '🔄 Ricomincia l\'avventura',
+        emoji: '🔄',
+        preview: 'Gioca di nuovo e scopri percorsi diversi!',
+        next: 'start',
+        stats: {}
+      }
+    ],
+    isEnding: true
+  },
+
+  // Stub nodes - redirect to coming_soon
+  alternate_path: {
+    id: 'alternate_path',
+    title: '🔍 Un Altro Sentiero',
+    text: 'Trovi un passaggio alternativo che ti porta verso nuove avventure...',
+    choices: [{
+      id: 'continue_alt',
+      text: '→ Continua',
+      emoji: '✨',
+      next: 'coming_soon',
+      stats: { curiosity: 1 }
+    }]
+  },
+
+  ancient_ruins: {
+    id: 'ancient_ruins',
+    title: '🏛️ Rovine Antiche',
+    text: 'Scopri rovine misteriose che nascondono segreti del passato...',
+    choices: [{
+      id: 'explore_ruins',
+      text: '→ Esplora',
+      emoji: '🔦',
+      next: 'coming_soon',
+      stats: { curiosity: 1 }
+    }]
+  },
+
+  cave_lesson: {
+    id: 'cave_lesson',
+    title: '📚 La Lezione della Grotta',
+    text: 'La grotta ti insegna una lezione importante sulla pazienza e la saggezza...',
+    choices: [{
+      id: 'learn_lesson',
+      text: '→ Impara',
+      emoji: '💡',
+      next: 'coming_soon',
+      stats: { magic: 1 }
+    }]
+  },
+
+  cave_wisdom: {
+    id: 'cave_wisdom',
+    title: '🔮 Saggezza Antica',
+    text: 'La grotta rivela saggezza antica incisa nelle sue pareti...',
+    choices: [{
+      id: 'gain_wisdom',
+      text: '→ Continua',
+      emoji: '📖',
+      next: 'coming_soon',
+      stats: { magic: 1 }
+    }]
+  },
+
+  dual_forest_solution: {
+    id: 'dual_forest_solution',
+    title: '🌲 Soluzione Doppia',
+    text: 'Utilizzi entrambe le tue nature per risolvere l\'enigma della foresta...',
+    choices: [{
+      id: 'dual_solve',
+      text: '→ Procedi',
+      emoji: '⚖️',
+      next: 'coming_soon',
+      stats: { courage: 1, kindness: 1 }
+    }]
+  },
+
+  forest_complete: {
+    id: 'forest_complete',
+    title: '🌲 Foresta Completata',
+    text: 'Hai esplorato tutta la Foresta dei Sussurri!',
+    choices: [{
+      id: 'leave_forest',
+      text: '→ Continua l\'avventura',
+      emoji: '🚶',
+      next: 'coming_soon',
+      stats: { courage: 1 }
+    }]
+  },
+
+  forest_to_lake: {
+    id: 'forest_to_lake',
+    title: '🌲→🌊 Verso il Lago',
+    text: 'Lasci la foresta e ti dirigi verso il Lago degli Specchi...',
+    choices: [{
+      id: 'reach_lake',
+      text: '→ Raggiungi il lago',
+      emoji: '🌊',
+      next: 'lake_shore',
+      stats: {}
+    }]
+  },
+
+  help_fish_quest: {
+    id: 'help_fish_quest',
+    text: `I pesci ti guidano a una grotta sottomarina. All'interno, il CRISTALLO BLU splende con luce gentile.
+
+"Grazie per averci aiutato!" cantano i pesci. "Questo cristallo è tuo."`,
+    title: '🐟 La Ricompensa dei Pesci',
+    choices: [{
+      id: 'take_blue_crystal',
+      text: '💙 Prendi il Cristallo Blu',
+      emoji: '💎',
+      next: 'coming_soon',
+      stats: { kindness: 2 }
+    }],
+    onEnter: (state) => {
+      if (!state.crystalsFound.includes('blu')) {
+        state.crystalsFound.push('blu');
+      }
+    }
+  },
+
+  lake_departure: {
+    id: 'lake_departure',
+    title: '🌊 Partenza dal Lago',
+    text: 'Ti congedi dal Lago degli Specchi e prosegui la tua avventura...',
+    choices: [{
+      id: 'leave_lake',
+      text: '→ Avanti',
+      emoji: '🚶',
+      next: 'coming_soon',
+      stats: {}
+    }]
+  },
+
+  nocino_home: {
+    id: 'nocino_home',
+    title: '🐿️ Casa di Nocino',
+    text: 'Nocino ti mostra la sua casa accogliente tra i rami...',
+    choices: [{
+      id: 'leave_home',
+      text: '→ Prosegui insieme',
+      emoji: '🤝',
+      next: 'coming_soon',
+      stats: { kindness: 1 }
+    }]
+  },
+
+  ombra_backstory: {
+    id: 'ombra_backstory',
+    title: '🐺 La Storia di Ombra',
+    text: 'Ombra ti racconta la sua storia di solitudine e ricerca...',
+    choices: [{
+      id: 'comfort_ombra',
+      text: '→ Ascolta e conforta',
+      emoji: '💙',
+      next: 'coming_soon',
+      stats: { kindness: 2 }
+    }]
+  },
+
+  ombra_joins: {
+    id: 'ombra_joins',
+    title: '🐺 Ombra si Unisce',
+    text: 'Ombra decide di unirsi alla tua avventura come fedele compagno!',
+    choices: [{
+      id: 'continue_with_ombra',
+      text: '→ Continuate insieme',
+      emoji: '🤝',
+      next: 'coming_soon',
+      stats: { courage: 1 }
+    }],
+    onEnter: (state) => {
+      if (!state.allies.includes('Ombra')) {
+        state.allies.push('Ombra');
+      }
+    }
+  },
+
+  rock_moved: {
+    id: 'rock_moved',
+    title: '💪 Roccia Spostata!',
+    text: 'Con intelligenza e forza, riesci a spostare la roccia! I pesci possono tornare a casa.',
+    choices: [{
+      id: 'fish_reward',
+      text: '→ I pesci ti ringraziano',
+      emoji: '🐟',
+      next: 'help_fish_quest',
+      stats: { courage: 1, kindness: 1 }
+    }]
+  },
+
+  secret_waterfall: {
+    id: 'secret_waterfall',
+    title: '💧 Cascata Segreta',
+    text: 'Scopri una cascata nascosta che conduce a una grotta luminosa...',
+    choices: [{
+      id: 'enter_waterfall',
+      text: '→ Attraversa la cascata',
+      emoji: '💦',
+      next: 'coming_soon',
+      stats: { curiosity: 1 }
+    }]
+  },
+
+  solo_to_peak: {
+    id: 'solo_to_peak',
+    title: '🏔️ Verso la Vetta',
+    text: 'Decidi di continuare da solo verso la vetta della montagna...',
+    choices: [{
+      id: 'climb_alone',
+      text: '→ Scala in solitaria',
+      emoji: '⛰️',
+      next: 'coming_soon',
+      stats: { courage: 2 }
+    }]
+  },
+
+  temple_silence: {
+    id: 'temple_silence',
+    title: '🤫 Il Silenzio Parla',
+    text: `Rimani in silenzio. Il tempio rispetta la tua scelta.
+
+Il CRISTALLO BLU brilla più luminoso. "Il silenzio è anche una forma di verità," dice la voce. "Il cristallo è tuo."`,
+    choices: [{
+      id: 'take_crystal_silence',
+      text: '💙 Prendi il Cristallo Blu',
+      emoji: '💎',
+      next: 'coming_soon',
+      stats: { magic: 2 }
+    }],
+    onEnter: (state) => {
+      if (!state.crystalsFound.includes('blu')) {
+        state.crystalsFound.push('blu');
+      }
+    }
+  },
+
+  temple_truth: {
+    id: 'temple_truth',
+    title: '💙 La Verità Libera',
+    text: `Rispondi onestamente a tutte e tre le domande. Parli del tuo cuore, dei tuoi sogni, delle tue paure.
+
+Il tempio vibra di luce blu. "La verità richiede coraggio," dice la voce, approvando. "Il CRISTALLO BLU è tuo."`,
+    choices: [{
+      id: 'take_crystal_truth',
+      text: '💙 Prendi il Cristallo Blu',
+      emoji: '💎',
+      next: 'coming_soon',
+      stats: { courage: 2 }
+    }],
+    onEnter: (state) => {
+      if (!state.crystalsFound.includes('blu')) {
+        state.crystalsFound.push('blu');
+      }
+    }
+  },
+
+  to_dragon_peak: {
+    id: 'to_dragon_peak',
+    title: '🐉 Il Picco del Drago',
+    text: 'Ti dirigi verso il leggendario Picco del Drago...',
+    choices: [{
+      id: 'approach_peak',
+      text: '→ Avvicinati',
+      emoji: '⛰️',
+      next: 'coming_soon',
+      stats: { courage: 1 }
+    }]
+  },
+
+  tree_accepts_joy: {
+    id: 'tree_accepts_joy',
+    title: '🌳 L\'Albero Gioisce',
+    text: 'L\'albero riconosce la gioia nel tuo cuore e si illumina di luce verde...',
+    choices: [{
+      id: 'receive_blessing',
+      text: '→ Ricevi la benedizione',
+      emoji: '✨',
+      next: 'coming_soon',
+      stats: { kindness: 1 }
+    }]
+  },
+
+  tree_accepts_love: {
+    id: 'tree_accepts_love',
+    title: '🌳 L\'Albero Accoglie l\'Amore',
+    text: 'L\'albero sente l\'amore nelle tue parole e ti dona il suo cristallo...',
+    choices: [{
+      id: 'receive_green_crystal',
+      text: '💚 Ricevi il Cristallo Verde',
+      emoji: '💎',
+      next: 'coming_soon',
+      stats: { kindness: 2 }
+    }],
+    onEnter: (state) => {
+      if (!state.crystalsFound.includes('verde')) {
+        state.crystalsFound.push('verde');
+      }
+    }
+  },
+
+  tree_accepts_wonder: {
+    id: 'tree_accepts_wonder',
+    title: '🌳 L\'Albero si Meraviglia',
+    text: 'L\'albero apprezza la tua meraviglia e curiosità verso il mondo...',
+    choices: [{
+      id: 'continue_wonder',
+      text: '→ Continua l\'esplorazione',
+      emoji: '🔍',
+      next: 'coming_soon',
+      stats: { curiosity: 1 }
+    }]
+  },
+
+  tree_reaction: {
+    id: 'tree_reaction',
+    title: '🌳 La Reazione dell\'Albero',
+    text: 'L\'albero reagisce alle tue parole con un fruscio di foglie...',
+    choices: [{
+      id: 'observe_reaction',
+      text: '→ Osserva',
+      emoji: '👀',
+      next: 'coming_soon',
+      stats: { curiosity: 1 }
+    }]
   },
 
   // ... continuerò con Atto 2 e Atto 3 nelle prossime aggiunte
