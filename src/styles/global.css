@@ -952,6 +952,40 @@ body {
   cursor: not-allowed;
 }
 
+/* Narrative Mode Toggle */
+.tts-narrative-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.tts-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.tts-checkbox:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tts-checkbox-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.tts-help-text {
+  margin-top: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  font-style: italic;
+  line-height: 1.4;
+}
+
 /* ============================================
    TEST RUNNER
    ============================================ */
