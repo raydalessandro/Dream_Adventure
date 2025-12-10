@@ -1,0 +1,19 @@
+{
+  "name": "dream-adventure-audio-scripts",
+  "version": "1.0.0",
+  "description": "Audio generation scripts for Dream Adventure",
+  "type": "module",
+  "scripts": {
+    "generate": "node audio-generation/generate-audio.js",
+    "generate:single": "node audio-generation/generate-audio.js --node",
+    "list-voices": "node audio-generation/generate-audio.js --list-voices",
+    "test-piper": "node audio-generation/generate-audio.js --test"
+  },
+  "dependencies": {
+    "@rhasspy/piper": "^1.0.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

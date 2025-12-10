@@ -2,11 +2,57 @@ import { useState, useEffect } from 'react';
 import type { StoryNode as StoryNodeType, GameState, Choice } from '../types';
 import { ChoiceButton } from './ChoiceButton';
 import { TextToSpeech } from './TextToSpeech';
+import { NarrationPlayer } from './NarrationPlayer';
 
 interface StoryNodeProps {
   node: StoryNodeType;
   gameState: GameState;
   onChoice: (choice: Choice) => void;
+}
+
+/**
+ * AudioNarration - Smart wrapper
+ * Prova NarrationPlayer (audio pre-registrato)
+ * Se non disponibile, fallback a TextToSpeech (browser)
+ */
+function AudioNarration({ nodeId, text }: { nodeId: string; text: string }) {
+  const [useNarration, setUseNarration] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Check se esiste audio pre-registrato
+    const audioPath = `/sounds/narration/${nodeId}.mp3`;
+
+    fetch(audioPath, { method: 'HEAD' })
+      .then((res) => {
+        setUseNarration(res.ok);
+        if (res.ok) {
+          console.log(`🎙️ Using pre-recorded narration for: ${nodeId}`);
+        } else {
+          console.log(`🔊 Using TTS fallback for: ${nodeId}`);
+        }
+      })
+      .catch(() => {
+        setUseNarration(false);
+        console.log(`🔊 Using TTS fallback for: ${nodeId}`);
+      });
+  }, [nodeId]);
+
+  // Loading state
+  if (useNarration === null) {
+    return (
+      <div className="audio-narration-loading">
+        <p>⏳ Caricamento audio...</p>
+      </div>
+    );
+  }
+
+  // Usa narrazione pre-registrata se disponibile
+  if (useNarration) {
+    return <NarrationPlayer nodeId={nodeId} autoPlay={false} />;
+  }
+
+  // Fallback a Text-to-Speech browser
+  return <TextToSpeech text={text} autoPlay={false} />;
 }
 
 export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
@@ -122,12 +168,9 @@ export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
         {isTyping && <span className="cursor">▋</span>}
       </div>
 
-      {/* Text-to-Speech */}
+      {/* Narrazione Audio (priorità: pre-registrato → TTS) */}
       {showChoices && (
-        <TextToSpeech 
-          text={node.text}
-          autoPlay={false}
-        />
+        <AudioNarration nodeId={node.id} text={node.text} />
       )}
 
       {/* Typing indicator */}
