@@ -5,6 +5,7 @@ import { StatsPanel } from './components/StatsPanel';
 import { CrystalCollection } from './components/CrystalCollection';
 import { AudioPlayer } from './components/AudioPlayer';
 import { TestRunner } from './components/TestRunner';
+import { SaveManager } from './components/SaveManager';
 import { useGameState } from './hooks/useGameState';
 import { endings, determineEnding } from './data/endings';
 import './styles/global.css';
@@ -19,7 +20,9 @@ function App() {
     resetGame,
     hasSavedGame,
     loadSavedGame,
-    startNewGame
+    startNewGame,
+    exportSave,
+    importSave
   } = useGameState();
 
   // Check for ?test query param
@@ -29,6 +32,11 @@ function App() {
       setShowTests(true);
     }
   }, []);
+
+  // Scroll to top on node change - MUST be before conditional returns
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [gameState.currentNode]);
 
   // Test mode
   if (showTests) {
@@ -70,11 +78,6 @@ function App() {
   // Show welcome screen if at start
   const isAtStart = gameState.currentNode === 'start' && gameState.path.length === 0;
   const showSavePrompt = isAtStart && hasSavedGame();
-
-  useEffect(() => {
-    // Scroll to top on node change
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [gameState.currentNode]);
 
   if (showSavePrompt) {
     return (
@@ -174,6 +177,7 @@ function App() {
           <div className="sidebar">
             <StatsPanel stats={gameState.stats} />
             <CrystalCollection crystalsFound={gameState.crystalsFound} />
+            <SaveManager onExport={exportSave} onImport={importSave} />
             <PathTracker gameState={gameState} />
           </div>
         </div>
@@ -195,6 +199,7 @@ function App() {
         <div className="sidebar">
           <StatsPanel stats={gameState.stats} />
           <CrystalCollection crystalsFound={gameState.crystalsFound} />
+          <SaveManager onExport={exportSave} onImport={importSave} />
           <PathTracker gameState={gameState} />
         </div>
       </div>
