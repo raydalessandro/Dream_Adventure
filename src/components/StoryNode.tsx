@@ -2,11 +2,57 @@ import { useState, useEffect } from 'react';
 import type { StoryNode as StoryNodeType, GameState, Choice } from '../types';
 import { ChoiceButton } from './ChoiceButton';
 import { TextToSpeech } from './TextToSpeech';
+import { NarrationPlayer } from './NarrationPlayer';
 
 interface StoryNodeProps {
   node: StoryNodeType;
   gameState: GameState;
   onChoice: (choice: Choice) => void;
+}
+
+/**
+ * AudioNarration - Smart wrapper
+ * Prova NarrationPlayer (audio pre-registrato)
+ * Se non disponibile, fallback a TextToSpeech (browser)
+ */
+function AudioNarration({ nodeId, text }: { nodeId: string; text: string }) {
+  const [useNarration, setUseNarration] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Check se esiste audio pre-registrato
+    const audioPath = `/sounds/narration/${nodeId}.mp3`;
+
+    fetch(audioPath, { method: 'HEAD' })
+      .then((res) => {
+        setUseNarration(res.ok);
+        if (res.ok) {
+          console.log(`🎙️ Using pre-recorded narration for: ${nodeId}`);
+        } else {
+          console.log(`🔊 Using TTS fallback for: ${nodeId}`);
+        }
+      })
+      .catch(() => {
+        setUseNarration(false);
+        console.log(`🔊 Using TTS fallback for: ${nodeId}`);
+      });
+  }, [nodeId]);
+
+  // Loading state
+  if (useNarration === null) {
+    return (
+      <div className="audio-narration-loading">
+        <p>⏳ Caricamento audio...</p>
+      </div>
+    );
+  }
+
+  // Usa narrazione pre-registrata se disponibile
+  if (useNarration) {
+    return <NarrationPlayer nodeId={nodeId} autoPlay={false} />;
+  }
+
+  // Fallback a Text-to-Speech browser
+  return <TextToSpeech text={text} autoPlay={false} />;
 }
 
 export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
@@ -91,19 +137,20 @@ export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
   }
 
   return (
-    <div className={`story-node ${isVisible ? 'visible' : ''}`}>
+    <div className={`story-node ${isVisible ? 'visible animate-fade-in-up' : ''}`}>
       {/* Header with title */}
-      <div className="story-header">
-        <h2 className="story-title">{node.title}</h2>
+      <div className="story-node-header">
+        <h2 className="story-node-title">{node.title}</h2>
+        <span className="story-node-id">#{node.id}</span>
       </div>
 
       {/* Image if present */}
       {node.image && (
         <div className="story-image-container">
-          <img 
-            src={`/images/locations/${node.image}`} 
+          <img
+            src={`/images/locations/${node.image}`}
             alt={node.title}
-            className="story-image"
+            className="story-image animate-scale-in"
             onError={(e) => {
               // Fallback if image doesn't exist
               e.currentTarget.style.display = 'none';
@@ -113,51 +160,50 @@ export function StoryNode({ node, gameState, onChoice }: StoryNodeProps) {
       )}
 
       {/* Story text */}
-      <div className="story-text" onClick={skipTyping}>
-        {displayedText.split('\n\n').map((paragraph, index) => (
-          <p key={index} className="story-paragraph">
-            {paragraph}
-          </p>
-        ))}
-        {isTyping && <span className="cursor">▋</span>}
-      </div>
-
-      {/* Text-to-Speech */}
-      {showChoices && (
-        <TextToSpeech 
-          text={node.text}
-          autoPlay={false}
-        />
-      )}
-
-      {/* Typing indicator */}
-      {isTyping && (
-        <div className="typing-hint">
-          <span className="typing-hint-text">Click per continuare...</span>
-        </div>
-      )}
-
-      {/* Choices */}
-      {showChoices && (
-        <div className="story-choices">
-          {availableChoices.map((choice) => (
-            <ChoiceButton
-              key={choice.id}
-              choice={choice}
-              onChoose={() => onChoice(choice)}
-              disabled={false}
-            />
+      <div className="story-node-content">
+        <div className="story-node-text" onClick={skipTyping}>
+          {displayedText.split('\n\n').map((paragraph, index) => (
+            <p key={index} className="story-paragraph">
+              {paragraph}
+            </p>
           ))}
+          {isTyping && <span className="cursor">▋</span>}
         </div>
-      )}
 
-      {/* Ending screen if it's an ending */}
-      {node.isEnding && showChoices && (
-        <div className="ending-badge">
-          <div className="ending-badge-icon">🌟</div>
-          <div className="ending-badge-text">Fine della Storia</div>
-        </div>
-      )}
+        {/* Narrazione Audio (priorità: pre-registrato → TTS) */}
+        {showChoices && (
+          <AudioNarration nodeId={node.id} text={node.text} />
+        )}
+
+        {/* Typing indicator */}
+        {isTyping && (
+          <div className="typing-hint">
+            <span className="typing-hint-text">Click per continuare...</span>
+          </div>
+        )}
+
+        {/* Choices with staggered animation */}
+        {showChoices && (
+          <div className="story-choices stagger-children">
+            {availableChoices.map((choice) => (
+              <ChoiceButton
+                key={choice.id}
+                choice={choice}
+                onChoose={() => onChoice(choice)}
+                disabled={false}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Ending screen if it's an ending */}
+        {node.isEnding && showChoices && (
+          <div className="ending-badge animate-scale-in">
+            <div className="ending-badge-icon">🌟</div>
+            <div className="ending-badge-text">Fine della Storia</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

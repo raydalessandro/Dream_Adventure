@@ -1,0 +1,34 @@
+{
+  "voiceModel": "it_IT-riccardo-x_low",
+  "voice": {
+    "name": "Riccardo",
+    "language": "it-IT",
+    "gender": "male",
+    "description": "Voce italiana maschile naturale, ottima per narrazione"
+  },
+  "alternatives": [
+    {
+      "name": "Paola",
+      "model": "it_IT-paola-medium",
+      "gender": "female",
+      "description": "Voce italiana femminile, adatta per bambini"
+    }
+  ],
+  "audio": {
+    "format": "mp3",
+    "sampleRate": 22050,
+    "bitrate": "128k",
+    "quality": "high"
+  },
+  "narration": {
+    "speed": 0.95,
+    "pitch": 1.0,
+    "pauseBetweenSentences": 0.3,
+    "pauseBetweenParagraphs": 0.8
+  },
+  "piperPath": {
+    "docker": "ghcr.io/rhasspy/piper:latest",
+    "standalone": "./piper",
+    "python": "piper-tts"
+  }
+}
